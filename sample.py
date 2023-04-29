@@ -1,15 +1,18 @@
 import sys
 import pygame
+from level import Level
+from game_data import level_0
 
 pygame.init()
 
-screen_width = 800
+screen_width = 1410
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
+level = Level(level_0, screen)
 pygame.display.set_caption("My Platform Game")
 
 player_width = 50
-player_height = 80
+player_height = 90
 
 background_image = pygame.image.load("background.png").convert()
 
@@ -110,12 +113,15 @@ class Platform(pygame.sprite.Sprite):
 platforms = pygame.sprite.Group()
 platforms.add(Platform(0, screen_height - 50, screen_width, 50))
 platforms.add(Platform(100, 500, 200, 20))
+platforms.add(Platform(0, 400, 200, 20))
+platforms.add(Platform(300, 300, 200, 20))
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+    level.run()
 
     fireboy.update()
     platform_collisions = pygame.sprite.spritecollide(fireboy, platforms, False)
@@ -128,6 +134,11 @@ while True:
             break
     else:
         fireboy.gravity = 0.01
+    for platform in platform_collisions:
+        if fireboy.rect.right == platform.rect.left+1:
+            fireboy.rect.right = platform.rect.left
+        if fireboy.rect.left == platform.rect.right-1:
+            fireboy.rect.left = platform.rect.right
 
     watergirl.update()
     platform_collisions = pygame.sprite.spritecollide(watergirl, platforms, False)
@@ -140,6 +151,11 @@ while True:
             break
     else:
         watergirl.gravity = 0.01
+    for platform in platform_collisions:
+        if watergirl.rect.right == platform.rect.left+1:
+            watergirl.rect.right = platform.rect.left
+        if watergirl.rect.left == platform.rect.right-1:
+            watergirl.rect.left = platform.rect.right
 
     screen.blit(picture, (0, 0))
     platforms.draw(screen)
